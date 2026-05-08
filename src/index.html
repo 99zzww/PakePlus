@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>企业员工签到签退系统</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #4A90E2;
+            --primary-dark: #357ABD;
+            --success-color: #27AE60;
+            --warning-color: #F39C12;
+            --danger-color: #E74C3C;
+            --bg-color: #F5F7FA;
+            --card-bg: #FFFFFF;
+            --text-primary: #2C3E50;
+            --text-secondary: #7F8C8D;
+            --border-color: #E1E8ED;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .login-container {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 450px;
+            margin: 0 auto 30px;
+            box-shadow: var(--shadow-hover);
+            display: block;
+        }
+
+        .login-container.hidden {
+            display: none;
+        }
+
+        .login-title {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-title i {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .login-title h2 {
+            font-size: 1.8rem;
+            color: var(--text-primary);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-color), #219A52);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning-color), #E67E22);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger-color), #C0392B);
+            color: white;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .main-content {
+            display: none;
+        }
+
+        .main-content.active {
+            display: block;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-hover);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .card-header i {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-right: 15px;
+        }
+
+        .card-header h3 {
+            font-size: 1.3rem;
+            color: var(--text-primary);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .user-details h2 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .user-details p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .datetime-display {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .current-date {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .current-time {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            font-family: 'Courier New', monospace;
+        }
+
+        .status-indicator {
+            text-align: center;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .status-indicator.not-signed {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            color: #D35400;
+        }
+
+        .status-indicator.signed-in {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #27AE60;
+        }
+
+        .status-indicator.signed-out {
+            background: linear-gradient(135deg, #d299c2 0%, #fef9d7 100%);
+            color: #8E44AD;
+        }
+
+        .status-indicator i {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .status-indicator h4 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .status-indicator p {
+            font-size: 0.95rem;
+            opacity: 0.8;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .action-buttons .btn {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .records-section {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .filter-section {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .filter-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-family: inherit;
+        }
+
+        .filter-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .records-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .records-table th,
+        .records-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .records-table th {
+            background: var(--bg-color);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .records-table tr:hover {
+            background: var(--bg-color);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .notifications-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            padding: 15px;
+            border-left: 4px solid var(--primary-color);
+            background: var(--bg-color);
+            margin-bottom: 10px;
+            border-radius: 0 10px 10px 0;
+            transition: all 0.3s ease;
+        }
+
+        .notification-item:hover {
+            background: #e8eef3;
+        }
+
+        .notification-item.urgent {
+            border-left-color: var(--danger-color);
+        }
+
+        .notification-item.important {
+            border-left-color: var(--warning-color);
+        }
+
+        .notification-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--text-primary);
+        }
+
+        .notification-content {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .notification-date {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 20px 30px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 500;
+            box-shadow: var(--shadow-hover);
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+            display: none;
+        }
+
+        .toast.show {
+            display: block;
+        }
+
+        .toast.success {
+            background: linear-gradient(135deg, var(--success-color), #219A52);
+        }
+
+        .toast.error {
+            background: linear-gradient(135deg, var(--danger-color), #C0392B);
+        }
+
+        .toast-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toast-content i {
+            font-size: 1.5rem;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .logout-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            border-radius: 25px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+
+        .logout-btn:hover {
+            background: white;
+            color: var(--primary-color);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: var(--bg-color);
+            border-radius: 10px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-section {
+                flex-direction: column;
+            }
+
+            .filter-group {
+                min-width: 100%;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .action-buttons .btn {
+                min-width: 100%;
+            }
+
+            .records-table {
+                font-size: 0.85rem;
+            }
+
+            .records-table th,
+            .records-table td {
+                padding: 10px;
+            }
+
+            .logout-btn {
+                top: 10px;
+                right: 10px;
+                padding: 8px 15px;
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .current-time {
+                font-size: 2.2rem;
+            }
+
+            .user-avatar {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5rem;
+            }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-building"></i> 企业员工签到签退系统</h1>
+            <p>欢迎使用智能考勤管理系统</p>
+        </div>
+
+        <div class="login-container" id="loginContainer">
+            <div class="login-title">
+                <i class="fas fa-user-circle"></i>
+                <h2>员工登录</h2>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="employeeId"><i class="fas fa-id-badge"></i> 员工工号</label>
+                    <input type="text" id="employeeId" placeholder="请输入您的工号" required>
+                </div>
+                <div class="form-group">
+                    <label for="employeeName"><i class="fas fa-user"></i> 员工姓名</label>
+                    <input type="text" id="employeeName" placeholder="请输入您的姓名" required>
+                </div>
+                <div class="form-group">
+                    <label for="department"><i class="fas fa-building"></i> 所属部门</label>
+                    <input type="text" id="department" placeholder="请输入所属部门" required>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-sign-in-alt"></i> 登录系统
+                </button>
+            </form>
+        </div>
+
+        <div class="main-content" id="mainContent">
+            <button class="logout-btn" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> 退出登录
+            </button>
+
+            <div class="grid">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-user-circle"></i>
+                        <h3>员工信息</h3>
+                    </div>
+                    <div class="user-info">
+                        <div class="user-avatar" id="userAvatar">张</div>
+                        <div class="user-details">
+                            <h2 id="displayName">张三</h2>
+                            <p><i class="fas fa-id-badge"></i> 工号: <span id="displayId">EMP001</span></p>
+                            <p><i class="fas fa-building"></i> 部门: <span id="displayDept">技术部</span></p>
+                        </div>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="monthDays">0</div>
+                            <div class="stat-label">本月出勤天数</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="lateTimes">0</div>
+                            <div class="stat-label">本月迟到次数</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-clock"></i>
+                        <h3>当前时间</h3>
+                    </div>
+                    <div class="datetime-display">
+                        <div class="current-date" id="currentDate">2024年01月01日 星期一</div>
+                        <div class="current-time" id="currentTime">00:00:00</div>
+                    </div>
+                    <div class="status-indicator not-signed" id="statusIndicator">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <h4 id="statusText">未签到</h4>
+                        <p id="statusDesc">请点击下方按钮进行签到</p>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-success" id="signInBtn" onclick="handleSignIn()">
+                            <i class="fas fa-sign-in-alt"></i> 签到
+                        </button>
+                        <button class="btn btn-warning" id="signOutBtn" onclick="handleSignOut()" disabled>
+                            <i class="fas fa-sign-out-alt"></i> 签退
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-bell"></i>
+                        <h3>系统通知</h3>
+                    </div>
+                    <div class="notifications-list" id="notificationsList">
+                        <div class="notification-item urgent">
+                            <div class="notification-title"><i class="fas fa-exclamation-triangle"></i> 重要通知</div>
+                            <div class="notification-content">五一假期安排：5月1日至5月5日放假，5月6日正常上班。</div>
+                            <div class="notification-date">2024-04-28 09:00</div>
+                        </div>
+                        <div class="notification-item important">
+                            <div class="notification-title"><i class="fas fa-info-circle"></i> 系统升级</div>
+                            <div class="notification-content">考勤系统将于本周六凌晨2:00-4:00进行系统升级维护。</div>
+                            <div class="notification-date">2024-04-27 14:30</div>
+                        </div>
+                        <div class="notification-item">
+                            <div class="notification-title"><i class="fas fa-calendar-check"></i> 考勤提醒</div>
+                            <div class="notification-content">请各位员工注意按时签到签退，保持良好考勤记录。</div>
+                            <div class="notification-date">2024-04-26 08:00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="records-section">
+                <div class="card-header">
+                    <i class="fas fa-history"></i>
+                    <h3>签到记录查询</h3>
+                </div>
+                <div class="filter-section">
+                    <div class="filter-group">
+                        <label for="startDate"><i class="fas fa-calendar-alt"></i> 开始日期</label>
+                        <input type="date" id="startDate">
+                    </div>
+                    <div class="filter-group">
+                        <label for="endDate"><i class="fas fa-calendar-alt"></i> 结束日期</label>
+                        <input type="date" id="endDate">
+                    </div>
+                    <button class="btn btn-primary" onclick="filterRecords()" style="min-width: 120px; flex: none;">
+                        <i class="fas fa-search"></i> 查询
+                    </button>
+                    <button class="btn btn-danger" onclick="clearRecords()" style="min-width: 120px; flex: none;">
+                        <i class="fas fa-trash"></i> 清空记录
+                    </button>
+                </div>
+                <div id="recordsContainer">
+                    <table class="records-table">
+                        <thead>
+                            <tr>
+                                <th>日期</th>
+                                <th>签到时间</th>
+                                <th>签退时间</th>
+                                <th>工作时长</th>
+                                <th>状态</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recordsBody">
+                        </tbody>
+                    </table>
+                    <div class="empty-state" id="emptyState" style="display: none;">
+                        <i class="fas fa-inbox"></i>
+                        <p>暂无签到记录</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">
+        <div class="toast-content">
+            <i class="fas fa-check-circle"></i>
+            <span id="toastMessage">操作成功</span>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let todayRecord = null;
+
+        function init() {
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                showMainContent();
+            }
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+            setDefaultDates();
+            checkTodayRecord();
+        }
+
+        function updateDateTime() {
+            const now = new Date();
+            const dateOptions = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+            const dateStr = now.toLocaleDateString('zh-CN', dateOptions);
+            const timeStr = now.toLocaleTimeString('zh-CN', { hour12: false });
+            
+            document.getElementById('currentDate').textContent = dateStr;
+            document.getElementById('currentTime').textContent = timeStr;
+        }
+
+        function setDefaultDates() {
+            const today = new Date();
+            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+            
+            document.getElementById('startDate').value = formatDateForInput(firstDay);
+            document.getElementById('endDate').value = formatDateForInput(today);
+        }
+
+        function formatDateForInput(date) {
+            return date.toISOString().split('T')[0];
+        }
+
+        function formatDate(date) {
+            const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+            return date.toLocaleDateString('zh-CN', options);
+        }
+
+        function formatTime(date) {
+            return date.toLocaleTimeString('zh-CN', { hour12: false });
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const employeeId = document.getElementById('employeeId').value.trim();
+            const employeeName = document.getElementById('employeeName').value.trim();
+            const department = document.getElementById('department').value.trim();
+            
+            if (!employeeId || !employeeName || !department) {
+                showToast('请填写完整的登录信息', 'error');
+                return;
+            }
+            
+            currentUser = {
+                id: employeeId,
+                name: employeeName,
+                department: department
+            };
+            
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            showMainContent();
+            showToast('登录成功！欢迎 ' + currentUser.name, 'success');
+        });
+
+        function showMainContent() {
+            document.getElementById('loginContainer').classList.add('hidden');
+            document.getElementById('mainContent').classList.add('active');
+            
+            document.getElementById('displayName').textContent = currentUser.name;
+            document.getElementById('displayId').textContent = currentUser.id;
+            document.getElementById('displayDept').textContent = currentUser.department;
+            document.getElementById('userAvatar').textContent = currentUser.name.charAt(0);
+            
+            loadRecords();
+            updateStats();
+            checkTodayRecord();
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            if (confirm('确定要退出登录吗？')) {
+                localStorage.removeItem('currentUser');
+                currentUser = null;
+                todayRecord = null;
+                document.getElementById('loginContainer').classList.remove('hidden');
+                document.getElementById('mainContent').classList.remove('active');
+                document.getElementById('loginForm').reset();
+                showToast('已成功退出登录', 'success');
+            }
+        });
+
+        function checkTodayRecord() {
+            if (!currentUser) return;
+            
+            const today = formatDateForInput(new Date());
+            const records = getRecords();
+            todayRecord = records.find(r => r.date === today && r.employeeId === currentUser.id);
+            
+            updateStatusIndicator();
+        }
+
+        function updateStatusIndicator() {
+            const indicator = document.getElementById('statusIndicator');
+            const statusText = document.getElementById('statusText');
+            const statusDesc = document.getElementById('statusDesc');
+            const signInBtn = document.getElementById('signInBtn');
+            const signOutBtn = document.getElementById('signOutBtn');
+            
+            if (!todayRecord) {
+                indicator.className = 'status-indicator not-signed';
+                indicator.innerHTML = '<i class="fas fa-exclamation-circle"></i><h4>未签到</h4><p>请点击下方按钮进行签到</p>';
+                signInBtn.disabled = false;
+                signOutBtn.disabled = true;
+            } else if (todayRecord.signInTime && !todayRecord.signOutTime) {
+                indicator.className = 'status-indicator signed-in';
+                indicator.innerHTML = '<i class="fas fa-check-circle"></i><h4>已签到</h4><p>签到时间: ' + todayRecord.signInTime + '</p>';
+                signInBtn.disabled = true;
+                signOutBtn.disabled = false;
+            } else if (todayRecord.signOutTime) {
+                indicator.className = 'status-indicator signed-out';
+                indicator.innerHTML = '<i class="fas fa-flag-checkered"></i><h4>已签退</h4><p>签退时间: ' + todayRecord.signOutTime + '</p>';
+                signInBtn.disabled = true;
+                signOutBtn.disabled = true;
+            }
+        }
+
+        function handleSignIn() {
+            if (!currentUser) return;
+            
+            const now = new Date();
+            const today = formatDateForInput(now);
+            const timeStr = formatTime(now);
+            
+            const records = getRecords();
+            const existingRecord = records.find(r => r.date === today && r.employeeId === currentUser.id);
+            
+            if (existingRecord) {
+                showToast('今日已完成签到', 'error');
+                return;
+            }
+            
+            const newRecord = {
+                employeeId: currentUser.id,
+                employeeName: currentUser.name,
+                department: currentUser.department,
+                date: today,
+                signInTime: timeStr,
+                signOutTime: null,
+                workHours: null,
+                status: determineStatus(timeStr, 'signIn')
+            };
+            
+            records.push(newRecord);
+            saveRecords(records);
+            
+            todayRecord = newRecord;
+            updateStatusIndicator();
+            loadRecords();
+            updateStats();
+            
+            showToast('签到成功！时间: ' + timeStr, 'success');
+        }
+
+        function handleSignOut() {
+            if (!currentUser || !todayRecord) return;
+            
+            const now = new Date();
+            const timeStr = formatTime(now);
+            
+            const records = getRecords();
+            const recordIndex = records.findIndex(r => 
+                r.date === todayRecord.date && r.employeeId === currentUser.id
+            );
+            
+            if (recordIndex === -1) {
+                showToast('未找到今日签到记录', 'error');
+                return;
+            }
+            
+            records[recordIndex].signOutTime = timeStr;
+            records[recordIndex].workHours = calculateWorkHours(records[recordIndex].signInTime, timeStr);
+            records[recordIndex].status = determineStatus(records[recordIndex].signInTime, 'signOut', timeStr);
+            
+            saveRecords(records);
+            
+            todayRecord = records[recordIndex];
+            updateStatusIndicator();
+            loadRecords();
+            updateStats();
+            
+            showToast('签退成功！时间: ' + timeStr + '，工作时长: ' + records[recordIndex].workHours, 'success');
+        }
+
+        function determineStatus(signInTime, type, signOutTime) {
+            const signInHour = parseInt(signInTime.split(':')[0]);
+            const signInMinute = parseInt(signInTime.split(':')[1]);
+            
+            if (type === 'signIn') {
+                if (signInHour > 9 || (signInHour === 9 && signInMinute > 0)) {
+                    return '迟到';
+                }
+                return '正常';
+            } else {
+                const signOutHour = parseInt(signOutTime.split(':')[0]);
+                if (signOutHour < 17) {
+                    return '早退';
+                }
+                return '正常';
+            }
+        }
+
+        function calculateWorkHours(signIn, signOut) {
+            const signInParts = signIn.split(':');
+            const signOutParts = signOut.split(':');
+            
+            const signInMinutes = parseInt(signInParts[0]) * 60 + parseInt(signInParts[1]);
+            const signOutMinutes = parseInt(signOutParts[0]) * 60 + parseInt(signOutParts[1]);
+            
+            const diffMinutes = signOutMinutes - signInMinutes;
+            const hours = Math.floor(diffMinutes / 60);
+            const minutes = diffMinutes % 60;
+            
+            return hours + '小时' + minutes + '分钟';
+        }
+
+        function getRecords() {
+            const recordsStr = localStorage.getItem('attendanceRecords');
+            return recordsStr ? JSON.parse(recordsStr) : [];
+        }
+
+        function saveRecords(records) {
+            localStorage.setItem('attendanceRecords', JSON.stringify(records));
+        }
+
+        function loadRecords() {
+            if (!currentUser) return;
+            
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            const records = getRecords();
+            let filteredRecords = records.filter(r => r.employeeId === currentUser.id);
+            
+            if (startDate && endDate) {
+                filteredRecords = filteredRecords.filter(r => 
+                    r.date >= startDate && r.date <= endDate
+                );
+            }
+            
+            filteredRecords.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            const tbody = document.getElementById('recordsBody');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (filteredRecords.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.style.display = 'block';
+                document.querySelector('.records-table').style.display = 'none';
+            } else {
+                emptyState.style.display = 'none';
+                document.querySelector('.records-table').style.display = 'table';
+                
+                tbody.innerHTML = filteredRecords.map(record => {
+                    let badgeClass = 'badge-success';
+                    if (record.status === '迟到') badgeClass = 'badge-warning';
+                    if (record.status === '早退') badgeClass = 'badge-info';
+                    
+                    return '<tr>' +
+                        '<td>' + record.date + '</td>' +
+                        '<td>' + (record.signInTime || '-') + '</td>' +
+                        '<td>' + (record.signOutTime || '-') + '</td>' +
+                        '<td>' + (record.workHours || '-') + '</td>' +
+                        '<td><span class="badge ' + badgeClass + '">' + record.status + '</span></td>' +
+                    '</tr>';
+                }).join('');
+            }
+        }
+
+        function filterRecords() {
+            loadRecords();
+            showToast('记录查询完成', 'success');
+        }
+
+        function clearRecords() {
+            if (!currentUser) return;
+            
+            if (confirm('确定要清空所有签到记录吗？此操作不可恢复！')) {
+                const records = getRecords();
+                const otherRecords = records.filter(r => r.employeeId !== currentUser.id);
+                saveRecords(otherRecords);
+                todayRecord = null;
+                loadRecords();
+                updateStats();
+                updateStatusIndicator();
+                showToast('签到记录已清空', 'success');
+            }
+        }
+
+        function updateStats() {
+            if (!currentUser) return;
+            
+            const records = getRecords().filter(r => r.employeeId === currentUser.id);
+            const today = new Date();
+            const currentMonth = today.getMonth();
+            const currentYear = today.getFullYear();
+            
+            const monthRecords = records.filter(r => {
+                const recordDate = new Date(r.date);
+                return recordDate.getMonth() === currentMonth && recordDate.getFullYear() === currentYear;
+            });
+            
+            document.getElementById('monthDays').textContent = monthRecords.length;
+            
+            const lateTimes = monthRecords.filter(r => r.status === '迟到').length;
+            document.getElementById('lateTimes').textContent = lateTimes;
+        }
+
+        function showToast(message, type) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            const toastIcon = toast.querySelector('i');
+            
+            toastMessage.textContent = message;
+            toast.className = 'toast show ' + type;
+            
+            if (type === 'success') {
+                toastIcon.className = 'fas fa-check-circle';
+            } else {
+                toastIcon.className = 'fas fa-exclamation-circle';
+            }
+            
+            setTimeout(function() {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
